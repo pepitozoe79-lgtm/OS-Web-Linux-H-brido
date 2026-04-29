@@ -118,29 +118,34 @@ El sistema no solo detecta fallos, sino que tiene la capacidad de autorepararse 
 
 ## 🛠️ Getting Started
 
-### Installation
+## 🚀 Quick Start / One-Click Install
+
+If you are on an **Ubuntu Server**, you can install the entire OS with a single command:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/pepitozoe79-lgtm/OS-Web-Linux-H-brido/main/install.sh | sudo bash
+```
+
+*Alternatively, if you have already cloned the repository:*
+
+```bash
+chmod +x install.sh
+sudo ./install.sh
+```
+
+---
+
+## 🛠️ Manual Installation
 1. Clone the repository:
    ```bash
    git clone https://github.com/pepitozoe79-lgtm/OS-Web-Linux-H-brido.git
    ```
-2. Install dependencies:
+2. Install dependencies & build:
    ```bash
    npm install
+   npm run build
    ```
-3. Run the development server:
-   ```bash
-   npm run dev
-   ```
-
-### 🐧 Ubuntu Server Deployment
-For production deployment on an Ubuntu Server (using Nginx), please refer to our dedicated guide:
-👉 **[INSTALL_UBUNTU.md](./INSTALL_UBUNTU.md)**
-
-Or run the automatic script:
-```bash
-chmod +x install.sh
-./install.sh
-```
+3. For Ubuntu/Nginx deployment details, see **[INSTALL_UBUNTU.md](./INSTALL_UBUNTU.md)**.
 
 ### PWA (Standalone Mode)
 For the most immersive experience, click the **"Install"** icon in your browser's address bar. This removes the browser UI and runs OS-Web-Linux-Híbrido as a standalone application.
