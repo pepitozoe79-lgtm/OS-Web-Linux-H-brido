@@ -110,7 +110,18 @@ function AppShell() {
   const showDesktop = bootComplete && auth.isAuthenticated;
 
   return (
-    <div className={`${state.theme.mode === 'light' ? 'light' : ''} distro-${state.theme.distro}`} style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>
+    <div 
+      className={`${state.theme.mode === 'light' ? 'light' : ''} distro-${state.theme.distro}`} 
+      style={{ 
+        width: '100vw', 
+        height: '100vh', 
+        overflow: 'hidden',
+        //@ts-ignore
+        '--accent-primary': state.theme.accent,
+        '--accent-primary-hover': state.theme.accent + 'dd',
+        '--bg-selected': state.theme.accent + '26'
+      }}
+    >
       {/* Boot Sequence */}
       {showBoot && <BootSequence onComplete={handleBootComplete} />}
 

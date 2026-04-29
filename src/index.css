@@ -133,39 +133,24 @@
 
   /* Distro Themes */
   .distro-ubuntu {
-    --accent-primary: #E95420;
-    --accent-primary-hover: #FF6329;
-    --bg-selected: rgba(233, 84, 32, 0.15);
+    --bg-desktop: #2c001e;
   }
-
   .distro-arch {
-    --accent-primary: #1793D1;
-    --accent-primary-hover: #1AB1FC;
-    --bg-panel: rgba(20, 20, 20, 0.9);
-    --radius-lg: 4px;
-    --radius-xl: 8px;
-    --bg-selected: rgba(23, 147, 209, 0.15);
+    --bg-desktop: #0f0f0f;
+    --radius-lg: 2px;
+    --radius-xl: 4px;
   }
-
   .distro-fedora {
-    --accent-primary: #294172;
-    --accent-primary-hover: #33518E;
-    --radius-lg: 14px;
-    --bg-selected: rgba(41, 65, 114, 0.15);
+    --bg-desktop: #081226;
+    --radius-lg: 16px;
   }
-
   .distro-kali {
-    --accent-primary: #2BB85C;
-    --accent-primary-hover: #34E070;
-    --bg-desktop: #0A0A0A;
-    --bg-window: #121212;
-    --bg-selected: rgba(43, 184, 92, 0.15);
+    --bg-desktop: #000000;
+    --bg-window: #0a0a0a;
+    --border-default: rgba(43, 184, 92, 0.2);
   }
-
   .distro-debian {
-    --accent-primary: #A80030;
-    --accent-primary-hover: #D6003D;
-    --bg-selected: rgba(168, 0, 48, 0.15);
+    --bg-desktop: #1a0005;
   }
 }
 

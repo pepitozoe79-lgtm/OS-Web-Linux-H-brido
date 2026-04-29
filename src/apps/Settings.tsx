@@ -18,10 +18,10 @@ interface SettingCategory {
 
 const DISTROS = [
   { id: 'ubuntu', name: 'Ubuntu', accent: '#E95420', wallpaper: '/wallpaper-default.jpg' },
-  { id: 'arch', name: 'Arch Linux', accent: '#1793D1', wallpaper: '/wallpaper-arch.jpg' },
-  { id: 'fedora', name: 'Fedora', accent: '#294172', wallpaper: '/wallpaper-fedora.jpg' },
-  { id: 'kali', name: 'Kali Linux', accent: '#2BB85C', wallpaper: '/wallpaper-kali.jpg' },
-  { id: 'debian', name: 'Debian', accent: '#A80030', wallpaper: '/wallpaper-debian.jpg' },
+  { id: 'arch', name: 'Arch Linux', accent: '#1793D1', wallpaper: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2070&auto=format&fit=crop' },
+  { id: 'fedora', name: 'Fedora', accent: '#294172', wallpaper: 'https://images.unsplash.com/photo-1614850523296-e8c041df43a0?q=80&w=2070&auto=format&fit=crop' },
+  { id: 'kali', name: 'Kali Linux', accent: '#2BB85C', wallpaper: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop' },
+  { id: 'debian', name: 'Debian', accent: '#A80030', wallpaper: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop' },
 ];
 
 const CATEGORIES: SettingCategory[] = [
