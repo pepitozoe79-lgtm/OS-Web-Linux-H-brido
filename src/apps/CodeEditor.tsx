@@ -233,7 +233,7 @@ export default function CodeEditor({ params }: { params?: any }) {
     } else {
       // Save to documents
       const docs = Object.values(fs.fs.nodes).find(
-        (n) => n.name === 'Documents' && n.parentId === userNodeId
+        (n: any) => n.name === 'Documents' && n.parentId === userNodeId
       );
       if (docs) {
         const newId = fs.createFile(docs.id, activeTab.name, activeTab.content);

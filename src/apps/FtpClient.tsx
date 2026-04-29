@@ -183,7 +183,7 @@ export default function FtpClient() {
             <span className="truncate" style={{ color: 'var(--text-secondary)' }}>Local</span>
           </div>
           <div className="flex-1 overflow-auto custom-scrollbar">
-            {localNodes.map(node => (
+            {localNodes.map((node: any) => (
               <button
                 key={node.id}
                 onClick={() => setSelectedLocal(node.id)}

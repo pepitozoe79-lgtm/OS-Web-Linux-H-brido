@@ -137,7 +137,7 @@ const COMMANDS: Record<string, (args: string[], ctx: TerminalContext) => string 
     return '';
   },
 
-  cat: (args, ctx) => {
+  cat: async (args, ctx) => {
     if (!args[0]) return 'cat: missing file operand';
     const currentNode = ctx.fs.findNodeByPath(ctx.currentPath);
     if (!currentNode) return 'cat: cannot read file';
@@ -153,7 +153,7 @@ const COMMANDS: Record<string, (args: string[], ctx: TerminalContext) => string 
     return content;
   },
 
-  edit: (args, ctx) => {
+  edit: async (args, ctx) => {
     if (!args[0]) return 'edit: missing file operand';
     const currentNode = ctx.fs.findNodeByPath(ctx.currentPath);
     if (!currentNode) return 'edit: cannot open file';
@@ -342,7 +342,7 @@ const COMMANDS: Record<string, (args: string[], ctx: TerminalContext) => string 
 
       if (subCommand === 'status') {
         const status = await git.statusMatrix({ fs: gitFs, dir });
-        return status.map(row => {
+        return status.map((row: any) => {
           const [file, head, workdir, stage] = row;
           return `${file}: ${head === workdir ? 'Clean' : 'Modified'}`;
         });
@@ -350,7 +350,7 @@ const COMMANDS: Record<string, (args: string[], ctx: TerminalContext) => string 
 
       if (subCommand === 'log') {
         const commits = await git.log({ fs: gitFs, dir, depth: 5 });
-        return commits.map(c => {
+        return commits.map((c: any) => {
           const { oid, commit } = c;
           return `\x1b[33m${oid.slice(0, 7)}\x1b[0m ${commit.message} (${commit.author.name})`;
         });

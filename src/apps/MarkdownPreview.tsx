@@ -201,7 +201,7 @@ export default function MarkdownPreview({ params }: { params?: any }) {
 
   const saveToFS = useCallback(async () => {
     const docs = Object.values(fs.fs.nodes).find(
-      (n) => n.name === 'Documents' && n.parentId
+      (n: any) => n.name === 'Documents' && n.parentId
     );
     if (docs) {
       await fs.createFile(docs.id, 'document.md', content);
