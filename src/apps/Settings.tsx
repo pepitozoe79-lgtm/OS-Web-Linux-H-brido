@@ -22,6 +22,11 @@ const DISTROS = [
   { id: 'fedora', name: 'Fedora', accent: '#294172', wallpaper: 'https://images.unsplash.com/photo-1614850523296-e8c041df43a0?q=80&w=2070&auto=format&fit=crop' },
   { id: 'kali', name: 'Kali Linux', accent: '#2BB85C', wallpaper: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop' },
   { id: 'debian', name: 'Debian', accent: '#A80030', wallpaper: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop' },
+  { id: 'manjaro', name: 'Manjaro', accent: '#35BF5C', wallpaper: 'https://images.unsplash.com/photo-1516339901600-af13f71897ea?q=80&w=2070&auto=format&fit=crop' },
+  { id: 'redhat', name: 'Red Hat', accent: '#EE0000', wallpaper: 'https://images.unsplash.com/photo-1635332064176-3f135f8e0d3a?q=80&w=2070&auto=format&fit=crop' },
+  { id: 'mint', name: 'Linux Mint', accent: '#87CF3E', wallpaper: 'https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2070&auto=format&fit=crop' },
+  { id: 'centos', name: 'CentOS', accent: '#26205A', wallpaper: 'https://images.unsplash.com/photo-1629654297299-c8506221ca97?q=80&w=2070&auto=format&fit=crop' },
+  { id: 'raspberry', name: 'Raspberry Pi', accent: '#C51A4A', wallpaper: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop' },
 ];
 
 const CATEGORIES: SettingCategory[] = [
@@ -56,10 +61,13 @@ const ACCENT_COLORS = [
 ];
 
 const WALLPAPERS = [
-  { id: '/wallpaper-default.jpg', name: 'Default' },
-  { id: '/wallpaper-light.jpg', name: 'Light' },
-  { id: '/wallpaper-nature.jpg', name: 'Nature' },
-  { id: '/wallpaper-tech.jpg', name: 'Tech' },
+  { id: '/wallpaper-default.jpg', name: 'Ubuntu Default' },
+  { id: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2064&auto=format&fit=crop', name: 'Abstract Flow' },
+  { id: 'https://images.unsplash.com/photo-1477346611705-65d1883cee1e?q=80&w=2070&auto=format&fit=crop', name: 'Dark Mountains' },
+  { id: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop', name: 'Digital Core' },
+  { id: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2070&auto=format&fit=crop', name: 'Cyberpunk' },
+  { id: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=2025&auto=format&fit=crop', name: 'Nebula' },
+  { id: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070&auto=format&fit=crop', name: 'Landscape' },
 ];
 
 const Toggle: React.FC<{ value: boolean; onChange: (v: boolean) => void }> = ({ value, onChange }) => (

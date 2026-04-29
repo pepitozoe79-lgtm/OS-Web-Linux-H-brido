@@ -13,6 +13,11 @@ const DISTRO_LOGOS: Record<string, string> = {
   fedora: '💙',
   kali: '🐉',
   debian: '🍥',
+  manjaro: '🌿',
+  redhat: '🎩',
+  mint: '🍃',
+  centos: '🔷',
+  raspberry: '🍓',
 };
 
 const DISTRO_NAMES: Record<string, string> = {
@@ -21,6 +26,11 @@ const DISTRO_NAMES: Record<string, string> = {
   fedora: 'Fedora',
   kali: 'Kali Linux',
   debian: 'Debian',
+  manjaro: 'Manjaro',
+  redhat: 'Red Hat Enterprise Linux',
+  mint: 'Linux Mint',
+  centos: 'CentOS',
+  raspberry: 'Raspberry Pi OS',
 };
 
 const TopPanel = memo(function TopPanel() {

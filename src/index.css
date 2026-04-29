@@ -152,6 +152,24 @@
   .distro-debian {
     --bg-desktop: #1a0005;
   }
+  .distro-manjaro {
+    --bg-desktop: #1a1a1a;
+    --radius-lg: 0px;
+    --radius-xl: 0px;
+  }
+  .distro-redhat {
+    --bg-desktop: #1e0000;
+  }
+  .distro-mint {
+    --bg-desktop: #121e12;
+    --radius-lg: 20px;
+  }
+  .distro-centos {
+    --bg-desktop: #0a0e1a;
+  }
+  .distro-raspberry {
+    --bg-desktop: #1a050a;
+  }
 }
 
 @layer utilities {
