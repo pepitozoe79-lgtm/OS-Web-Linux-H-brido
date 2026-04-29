@@ -2,7 +2,7 @@
 // Markdown Preview — Split-pane editor + live preview
 // ============================================================
 
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useFileSystem } from '@/hooks/useFileSystem';
 import {
   Bold, Italic, Heading, Link, Image, Code, Quote, List,
@@ -209,11 +209,12 @@ export default function MarkdownPreview({ params }: { params?: any }) {
   }, [fs, content]);
 
   const loadFromFS = useCallback(async () => {
-    const docs = Object.values(fs.fs.nodes).find(
+    const nodes = fs.fs.nodes as Record<string, any>;
+    const docs = Object.values(nodes).find(
       (n) => n.name === 'Documents' && n.parentId
     );
     if (!docs) return;
-    const files = fs.getChildren(docs.id).filter((n) => n.type === 'file' && n.name.endsWith('.md'));
+    const files = fs.getChildren(docs.id).filter((n: any) => n.type === 'file' && n.name.endsWith('.md'));
     if (files.length > 0) {
       const raw = await fs.readFile(files[0].id);
       const text = raw instanceof Blob ? await raw.text() : (raw || '');

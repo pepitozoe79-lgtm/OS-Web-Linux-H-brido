@@ -2,7 +2,7 @@
 // JSON Formatter — Format, validate, minify, tree view
 // ============================================================
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useFileSystem } from '@/hooks/useFileSystem';
 import {
   Wand2, Minimize2, Check, X, Copy, Download,
@@ -281,7 +281,8 @@ export default function JsonFormatter({ params }: { params?: any }) {
   }, [validateJson, indent]);
 
   const loadFromFS = useCallback(async () => {
-    const docs = Object.values(fs.fs.nodes).find(
+    const nodes = fs.fs.nodes as Record<string, any>;
+    const docs = Object.values(nodes).find(
       (n) => n.name === 'Documents' && n.parentId
     );
     if (!docs) return;

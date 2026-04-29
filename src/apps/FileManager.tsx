@@ -35,12 +35,12 @@ export default function FileManager() {
   const fs = useFileSystem();
   const { dispatch } = useOS();
   const [currentFolderId, setCurrentFolderId] = useState<string>(() => {
-    // Find home/user folder
-    const rootChildren = Object.values(fs.fs.nodes).filter((n) => n.parentId === null);
+    const nodes = fs.fs.nodes as Record<string, any>;
+    const rootChildren = Object.values(nodes).filter((n) => n.parentId === null);
     const homeNode = rootChildren.find((n) => n.name === 'home');
     const userNode = homeNode
-      ? Object.values(fs.fs.nodes).find((n) => n.parentId === homeNode.id && n.name === 'user')
-      : undefined;
+      ? Object.values(nodes).find((n) => n.parentId === homeNode.id && n.name === 'user')
+      : null;
     return userNode?.id || '';
   });
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
@@ -59,7 +59,7 @@ export default function FileManager() {
 
   const filteredChildren = useMemo(() => {
     if (!searchQuery) return children;
-    return children.filter((c) =>
+    return children.filter((c: any) =>
       c.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [children, searchQuery]);

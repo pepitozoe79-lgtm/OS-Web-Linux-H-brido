@@ -2,7 +2,7 @@
 // Code Editor — Multi-tab editor with syntax highlighting
 // ============================================================
 
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useFileSystem } from '@/hooks/useFileSystem';
 import {
   Code2, X, Plus, Search, Save, FolderOpen, FileText,
@@ -155,7 +155,8 @@ export default function CodeEditor({ params }: { params?: any }) {
   const activeTab = tabs.find((t) => t.id === activeTabId);
 
   const userNodeId = useMemo(() => {
-    const rootChildren = Object.values(fs.fs.nodes).filter((n) => n.parentId === null);
+    const nodes = fs.fs.nodes as Record<string, any>;
+    const rootChildren = Object.values(nodes).filter((n) => n.parentId === null);
     const homeNode = rootChildren.find((n) => n.name === 'home');
     const userNode = homeNode
       ? Object.values(fs.fs.nodes).find((n) => n.parentId === homeNode.id && n.name === 'user')

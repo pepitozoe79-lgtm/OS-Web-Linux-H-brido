@@ -55,6 +55,12 @@ interface FileSystemContextType {
 
 const FileSystemContext = createContext<FileSystemContextType | null>(null);
 
+export const useFileSystem = () => {
+  const context = useContext(FileSystemContext);
+  if (!context) throw new Error('useFileSystem must be used within a FileSystemProvider');
+  return context;
+};
+
 const createDefaultFS = (): FileSystemState => {
   const rootId = generateId();
   const homeId = generateId();
@@ -99,7 +105,7 @@ const createDefaultFS = (): FileSystemState => {
   return { nodes, trashMetadata: {} };
 };
 
-export function FileSystemProvider({ children }: { children: React.ReactNode }) {
+export const FileSystemProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [fs, setFs] = useState<FileSystemState>({ nodes: {}, trashMetadata: {} });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -222,7 +228,7 @@ export function FileSystemProvider({ children }: { children: React.ReactNode }) 
     });
   }, []);
 
-  const readFile = useCallback((id: string) => fs.nodes[id]?.type === 'file' ? fs.nodes[id].content : undefined, [fs.nodes]);
+  const readFile = useCallback(async (id: string) => fs.nodes[id]?.type === 'file' ? fs.nodes[id].content : undefined, [fs.nodes]);
 
   const writeFile = useCallback(async (id: string, content: string | Blob) => {
     setFs((prev) => {
@@ -333,7 +339,7 @@ export function FileSystemProvider({ children }: { children: React.ReactNode }) 
       const isText = textExts.some(ext => node.name.endsWith(ext));
       content = isText ? await file.text() : file;
     } else {
-      content = originalReadFile(id);
+      content = await originalReadFile(id);
     }
 
     // Cryptographic Validation on Read
@@ -384,8 +390,3 @@ export function FileSystemProvider({ children }: { children: React.ReactNode }) 
   return <FileSystemContext.Provider value={value}>{children}</FileSystemContext.Provider>;
 }
 
-export function useFileSystem() {
-  const context = useContext(FileSystemContext);
-  if (!context) throw new Error('useFileSystem must be used within a FileSystemProvider');
-  return context;
-}

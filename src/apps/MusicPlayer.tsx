@@ -325,7 +325,7 @@ export default function MusicPlayer({ params }: MusicPlayerProps) {
           <div className="flex items-center justify-between px-4 py-3 border-bottom border-[var(--border-subtle)] sticky top-0 bg-[var(--bg-window)] z-10">
             <span className="text-xs font-semibold text-[var(--text-primary)]">Playlist</span>
             <button onClick={() => setShowPlaylist(false)} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
-              <Icons.X size={16} />
+              <X size={16} />
             </button>
           </div>
           <div className="overflow-y-auto custom-scrollbar h-[calc(100%-40px)]">

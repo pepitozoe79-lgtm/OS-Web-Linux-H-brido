@@ -86,7 +86,6 @@ export default function DocumentViewer({ params }: { params?: any }) {
   const [showSearch, setShowSearch] = useState(false);
   const [searchIndex, setSearchIndex] = useState(0);
   const [showFilePicker, setShowFilePicker] = useState(false);
-  const [pickerPath, setPickerPath] = useState<string>('Documents');
   const contentRef = useRef<HTMLDivElement>(null);
 
   const node = currentFileId ? getNodeById(currentFileId) : undefined;
@@ -156,10 +155,13 @@ export default function DocumentViewer({ params }: { params?: any }) {
 
   const getTextFiles = useCallback(() => {
     const textExts = ['.txt', '.md', '.json', '.js', '.ts', '.html', '.css'];
-    return Object.values(fs.nodes).filter(
-      n => n.type === 'file' && textExts.some(ext => n.name.endsWith(ext))
+    const children = getChildren('root');
+    return children.filter(
+      (n: any) => n.type === 'file' && textExts.some(ext => n.name.endsWith(ext))
     );
-  }, [fs.nodes]);
+  }, [getChildren]);
+
+  const files = getTextFiles();
 
   return (
     <div className="flex flex-col h-full" style={{ background: 'var(--bg-window)' }}>
@@ -264,21 +266,18 @@ export default function DocumentViewer({ params }: { params?: any }) {
               <button onClick={() => setShowFilePicker(false)} className="p-1 rounded"><X size={14} /></button>
             </div>
             <div className="overflow-auto custom-scrollbar p-2" style={{ maxHeight: '320px' }}>
-              {getTextFiles().map(file => (
+              {files.map((file: any) => (
                 <button
                   key={file.id}
                   onClick={() => openFile(file.id)}
-                  className="flex items-center gap-2 w-full px-3 py-2 rounded-md text-left text-sm transition-colors"
-                  style={{ color: 'var(--text-primary)' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-hover)')}
-                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                  className="flex items-center gap-3 w-full px-3 py-2 rounded-lg transition-colors hover:bg-[var(--bg-hover)] text-left group"
                 >
-                  <FileText size={14} style={{ color: 'var(--accent-primary)' }} />
+                  <FileText size={16} className="text-[var(--text-secondary)] group-hover:text-[var(--accent-primary)]" />
                   <span className="flex-1">{file.name}</span>
                   <span className="text-xs" style={{ color: 'var(--text-disabled)' }}>{file.size || 0} B</span>
                 </button>
               ))}
-              {getTextFiles().length === 0 && (
+              {files.length === 0 && (
                 <div className="text-center py-8 text-sm" style={{ color: 'var(--text-secondary)' }}>No text files found</div>
               )}
             </div>

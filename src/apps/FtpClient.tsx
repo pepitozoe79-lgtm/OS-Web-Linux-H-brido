@@ -68,11 +68,13 @@ export default function FtpClient() {
   const [newFolderName, setNewFolderName] = useState('');
 
   useEffect(() => {
-    const rootNode = Object.values(fs.nodes).find(n => n.parentId === null);
+    const nodes = fs.nodes as Record<string, any>;
+    const rootNode = Object.values(nodes).find(n => n.parentId === null);
+    
     if (rootNode) {
-      const userNode = getChildren(rootNode.id).find(n => n.name === 'home');
+      const userNode = getChildren(rootNode.id).find((n: any) => n.name === 'home');
       if (userNode) {
-        const homeChild = getChildren(userNode.id).find(n => n.name === 'user');
+        const homeChild = getChildren(userNode.id).find((n: any) => n.name === 'user');
         if (homeChild) setLocalPath(homeChild.id);
       }
     }

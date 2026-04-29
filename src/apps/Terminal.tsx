@@ -298,7 +298,9 @@ const COMMANDS: Record<string, (args: string[], ctx: TerminalContext) => string 
     
     // Dynamic imports for git
     const [git, http, { createGitFs }] = await Promise.all([
+      // @ts-ignore
       import('https://esm.sh/isomorphic-git'),
+      // @ts-ignore
       import('https://esm.sh/isomorphic-git/http/web'),
       import('@/lib/git-bridge')
     ]);

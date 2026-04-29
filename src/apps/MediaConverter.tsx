@@ -50,11 +50,13 @@ export default function MediaConverter() {
   const [jobs, setJobs] = useState<ConversionJob[]>([]);
   const [showSettings, setShowSettings] = useState(false);
 
-  const mediaFiles = Object.values(fs.nodes).filter(n => {
+  const isSupported = (n: any) => {
     if (n.type !== 'file') return false;
     const ext = n.name.split('.').pop()?.toUpperCase();
-    return ext && ALL_FORMATS.includes(ext);
-  });
+    return ['MP4', 'MOV', 'AVI', 'MP3', 'WAV', 'OGG'].includes(ext || '');
+  };
+
+  const mediaFiles = Object.values(fs.nodes).filter(isSupported);
 
   const selectFile = (id: string, name: string) => {
     const ext = name.split('.').pop()?.toUpperCase() || 'MP4';
