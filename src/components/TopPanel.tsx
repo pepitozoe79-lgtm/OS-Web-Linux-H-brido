@@ -167,13 +167,22 @@ const TopPanel = memo(function TopPanel() {
                 { label: 'Wi-Fi', icon: '📶', toggle: true },
                 { label: 'Bluetooth', icon: '🔵', toggle: true },
               ].map((item) => (
-                <div key={item.label} className="flex items-center gap-2 px-3 py-2 hover:bg-[var(--bg-hover)] cursor-pointer">
+                <div 
+                  key={item.label} 
+                  className="flex items-center gap-2 px-3 py-2 hover:bg-[var(--bg-hover)] cursor-pointer"
+                  onClick={() => {
+                    if (item.label === 'Wi-Fi') dispatch({ type: 'ADD_NOTIFICATION', notification: { title: 'Network', message: 'Wi-Fi toggled', type: 'info', icon: 'Wifi' }});
+                  }}
+                >
                   <span className="text-xs">{item.icon}</span>
                   <span className="text-sm flex-1">{item.label}</span>
                   {item.toggle && (
-                    <div className="w-8 h-5 rounded-full relative" style={{ background: 'var(--accent-primary)' }}>
-                      <div className="absolute right-0.5 top-0.5 w-4 h-4 rounded-full bg-white" />
-                    </div>
+                    <button 
+                      className="w-8 h-5 rounded-full relative transition-colors" 
+                      style={{ background: 'var(--accent-primary)' }}
+                    >
+                      <div className="absolute right-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow-sm" />
+                    </button>
                   )}
                 </div>
               ))}
@@ -196,7 +205,13 @@ const TopPanel = memo(function TopPanel() {
               </button>
               <button
                 className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-[var(--bg-hover)] transition-colors text-left"
-                onClick={() => setSysMenuOpen(false)}
+                onClick={() => {
+                  setSysMenuOpen(false);
+                  if (confirm('Are you sure you want to power off?')) {
+                    dispatch({ type: 'SET_BOOT_PHASE', phase: 'off' });
+                    window.location.reload();
+                  }
+                }}
               >
                 <span>⏻</span>
                 Power Off / Restart
