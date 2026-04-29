@@ -70,8 +70,8 @@ const COMMANDS: Record<string, (args: string[], ctx: TerminalContext) => string 
     if (children.length === 0) return '';
     
     return children
-      .sort((a, b) => (a.type === b.type ? a.name.localeCompare(b.name) : a.type === 'folder' ? -1 : 1))
-      .map((c) => {
+      .sort((a: any, b: any) => (a.type === b.type ? a.name.localeCompare(b.name) : a.type === 'folder' ? -1 : 1))
+      .map((c: any) => {
         const color = c.type === 'folder' ? '\x1b[34m' : '\x1b[0m';
         return `${color}${c.name}\x1b[0m`;
       })
@@ -130,7 +130,7 @@ const COMMANDS: Record<string, (args: string[], ctx: TerminalContext) => string 
     if (!currentNode) return 'rm: cannot access current directory';
     
     const children = ctx.fs.getChildren(currentNode.id);
-    const target = children.find((c) => c.name === args[0]);
+    const target = children.find((c: any) => c.name === args[0]);
     
     if (!target) return `rm: cannot remove '${args[0]}': No such file or directory`;
     ctx.fs.deleteNode(target.id);
@@ -143,14 +143,14 @@ const COMMANDS: Record<string, (args: string[], ctx: TerminalContext) => string 
     if (!currentNode) return 'cat: cannot read file';
     
     const children = ctx.fs.getChildren(currentNode.id);
-    const target = children.find((c) => c.name === args[0]);
+    const target = children.find((c: any) => c.name === args[0]);
     
     if (!target) return `cat: '${args[0]}': No such file or directory`;
     if (target.type === 'folder') return `cat: '${args[0]}': Is a directory`;
     
-    const content = ctx.fs.readFile(target.id);
-    if (content instanceof Blob) return '[Binary Data]';
-    return content || '';
+    const raw = await ctx.fs.readFile(target.id);
+    const content = raw instanceof Blob ? await raw.text() : (raw || '');
+    return content;
   },
 
   edit: (args, ctx) => {
@@ -159,7 +159,7 @@ const COMMANDS: Record<string, (args: string[], ctx: TerminalContext) => string 
     if (!currentNode) return 'edit: cannot open file';
     
     const children = ctx.fs.getChildren(currentNode.id);
-    let target = children.find((c) => c.name === args[0]);
+    let target = children.find((c: any) => c.name === args[0]);
     
     let fileId = '';
     if (!target) {

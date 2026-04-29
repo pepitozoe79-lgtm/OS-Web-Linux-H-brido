@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import type { FileSystemNode, FileSystemState, FileAssociation } from '@/types';
 import { vfsDriver, generateHash } from '@/lib/vfs-db';
 
@@ -32,7 +32,7 @@ export const getFileAssociation = (filename: string): FileAssociation | undefine
   return FILE_ASSOCIATIONS.find((a) => a.extension === ext);
 };
 
-interface FileSystemContextType {
+export interface FileSystemContextType {
   fs: FileSystemState;
   isLoading: boolean;
   getChildren: (parentId: string) => FileSystemNode[];
@@ -55,11 +55,11 @@ interface FileSystemContextType {
 
 const FileSystemContext = createContext<FileSystemContextType | null>(null);
 
-export const useFileSystem = () => {
+export function useFileSystem() {
   const context = useContext(FileSystemContext);
   if (!context) throw new Error('useFileSystem must be used within a FileSystemProvider');
   return context;
-};
+}
 
 const createDefaultFS = (): FileSystemState => {
   const rootId = generateId();
@@ -105,7 +105,7 @@ const createDefaultFS = (): FileSystemState => {
   return { nodes, trashMetadata: {} };
 };
 
-export const FileSystemProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export function FileSystemProvider({ children }: { children: React.ReactNode }) {
   const [fs, setFs] = useState<FileSystemState>({ nodes: {}, trashMetadata: {} });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -228,9 +228,9 @@ export const FileSystemProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     });
   }, []);
 
-  const readFile = useCallback(async (id: string) => fs.nodes[id]?.type === 'file' ? fs.nodes[id].content : undefined, [fs.nodes]);
+  const internalReadFile = useCallback(async (id: string) => fs.nodes[id]?.type === 'file' ? fs.nodes[id].content : undefined, [fs.nodes]);
 
-  const writeFile = useCallback(async (id: string, content: string | Blob) => {
+  const internalWriteFile = useCallback(async (id: string, content: string | Blob) => {
     setFs((prev) => {
       const node = prev.nodes[id];
       if (!node || node.type !== 'file') return prev;
@@ -291,15 +291,11 @@ export const FileSystemProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setFs((prev) => {
       const newNodes = { ...prev.nodes };
       nodes.forEach(n => {
-        // Avoid duplicates if scanning again
         const existing = Object.values(newNodes).find(en => en.parentId === parentId && en.name === n.name);
         if (!existing) newNodes[n.id] = n;
       });
       return { ...prev, nodes: newNodes };
     });
-    
-    // Save to VFS driver? No, handles are not serializable in IDB easily.
-    // We keep them in memory for the session.
   }, []);
 
   const mountHostDirectory = useCallback(async (parentId: string) => {
@@ -317,7 +313,6 @@ export const FileSystemProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       };
       
       setFs((prev) => ({ ...prev, nodes: { ...prev.nodes, [id]: node } }));
-      // Start initial scan
       await scanHostDirectory(id, handle);
       return id;
     } catch (err) {
@@ -326,9 +321,7 @@ export const FileSystemProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   }, [scanHostDirectory]);
 
-  // Override readFile to handle host handles and hash validation
-  const originalReadFile = readFile;
-  const readHostFile = useCallback(async (id: string, validate = true) => {
+  const readFile = useCallback(async (id: string, validate = true) => {
     const node = fs.nodes[id];
     if (!node) return undefined;
 
@@ -339,10 +332,9 @@ export const FileSystemProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const isText = textExts.some(ext => node.name.endsWith(ext));
       content = isText ? await file.text() : file;
     } else {
-      content = await originalReadFile(id);
+      content = await internalReadFile(id);
     }
 
-    // Cryptographic Validation on Read
     if (validate && node.type === 'file' && node.hash && content !== undefined) {
       const currentHash = await generateHash(content);
       if (currentHash !== node.hash) {
@@ -352,11 +344,9 @@ export const FileSystemProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
 
     return content;
-  }, [fs.nodes, originalReadFile]);
+  }, [fs.nodes, internalReadFile]);
 
-  // Override writeFile to handle host handles
-  const originalWriteFile = writeFile;
-  const writeHostFile = useCallback(async (id: string, content: string | Blob) => {
+  const writeFile = useCallback(async (id: string, content: string | Blob) => {
     const node = fs.nodes[id];
     if (node?.handle && node.type === 'file') {
       const writable = await (node.handle as any).createWritable();
@@ -372,14 +362,14 @@ export const FileSystemProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       }));
       return;
     }
-    originalWriteFile(id, content);
-  }, [fs.nodes, originalWriteFile]);
+    await internalWriteFile(id, content);
+  }, [fs.nodes, internalWriteFile]);
 
-  const value = {
+  const value: FileSystemContextType = {
     fs, isLoading, getChildren, getNodeById, getNodePath, createFile, createFolder,
     deleteNode, moveToTrash, renameNode, moveNode, 
-    readFile: readHostFile, 
-    writeFile: writeHostFile, 
+    readFile, 
+    writeFile, 
     emptyTrash,
     getTrashItems: () => Object.keys(fs.trashMetadata).map((id) => fs.nodes[id]).filter(Boolean),
     findNodeByPath,
@@ -389,4 +379,3 @@ export const FileSystemProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   return <FileSystemContext.Provider value={value}>{children}</FileSystemContext.Provider>;
 }
-

@@ -21,7 +21,7 @@ export const createGitFs = (fs: ReturnType<typeof useFileSystem>) => {
       if (!parentNode) throw new Error(`ENOENT: no such file or directory, mkdir '${parentPath}'`);
       
       const existing = fs.findNodeByPath(path);
-      const content = data instanceof Uint8Array ? new Blob([data]) : data;
+      const content = data instanceof Uint8Array ? new Blob([data.buffer as ArrayBuffer]) : data;
       
       if (existing) {
         await fs.writeFile(existing.id, content);
@@ -38,7 +38,7 @@ export const createGitFs = (fs: ReturnType<typeof useFileSystem>) => {
     async readdir(path: string) {
       const node = fs.findNodeByPath(path);
       if (!node || node.type !== 'folder') return [];
-      return fs.getChildren(node.id).map(n => n.name);
+      return fs.getChildren(node.id).map((n: any) => n.name);
     },
 
     async mkdir(path: string) {

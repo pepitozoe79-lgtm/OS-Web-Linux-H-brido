@@ -47,7 +47,7 @@ export default function ImageViewer({ params }: ImageViewerProps) {
     if (!parentId) return [file as any];
 
     const siblings = getChildren(parentId);
-    const imageFiles = siblings.filter(n => 
+    const imageFiles = siblings.filter((n: any) => 
       n.type === 'file' && 
       (n.name.toLowerCase().endsWith('.jpg') || 
        n.name.toLowerCase().endsWith('.jpeg') || 
@@ -55,7 +55,7 @@ export default function ImageViewer({ params }: ImageViewerProps) {
        n.name.toLowerCase().endsWith('.gif'))
     );
 
-    return imageFiles.map(f => ({
+    return imageFiles.map((f: any) => ({
       id: f.id,
       name: f.name,
       src: '', 

@@ -286,7 +286,7 @@ export default function JsonFormatter({ params }: { params?: any }) {
       (n) => n.name === 'Documents' && n.parentId
     );
     if (!docs) return;
-    const files = fs.getChildren(docs.id).filter((n) => n.type === 'file' && n.name.endsWith('.json'));
+    const files = fs.getChildren(docs.id).filter((n: any) => n.type === 'file' && n.name.endsWith('.json'));
     if (files.length > 0) {
       const raw = await fs.readFile(files[0].id);
       const text = raw instanceof Blob ? await raw.text() : (raw || '');

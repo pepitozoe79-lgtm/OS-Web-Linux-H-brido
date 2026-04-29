@@ -93,7 +93,7 @@ function FileTree({
   depth?: number;
 }) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
-  const children = fs.getChildren(nodeId).filter((c) => !c.name.startsWith('.'));
+  const children = fs.getChildren(nodeId).filter((c: any) => !c.name.startsWith('.'));
 
   const toggleFolder = useCallback((id: string) => {
     setExpanded((prev) => {
@@ -106,7 +106,7 @@ function FileTree({
 
   return (
     <div>
-      {children.map((child) => (
+      {children.map((child: any) => (
         <div key={child.id}>
           <div
             className="flex items-center gap-1 px-2 py-1 cursor-pointer hover:bg-[var(--bg-hover)] transition-colors"
@@ -159,7 +159,7 @@ export default function CodeEditor({ params }: { params?: any }) {
     const rootChildren = Object.values(nodes).filter((n) => n.parentId === null);
     const homeNode = rootChildren.find((n) => n.name === 'home');
     const userNode = homeNode
-      ? Object.values(fs.fs.nodes).find((n) => n.parentId === homeNode.id && n.name === 'user')
+      ? Object.values(nodes).find((n) => n.parentId === homeNode.id && n.name === 'user')
       : undefined;
     return userNode?.id || '';
   }, [fs.fs.nodes]);

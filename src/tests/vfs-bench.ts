@@ -21,6 +21,7 @@ async function runBenchmark() {
       parentId: 'bench_root',
       content: dummyContent, 
       size: dummyContent.size,
+      createdAt: Date.now(),
       modifiedAt: Date.now()
     });
   }

@@ -213,7 +213,8 @@ const TextEditor: React.FC<TextEditorProps> = ({ params }) => {
   };
 
   // Open dialog file list
-  const allFiles = Object.values(fs.nodes).filter(n => n.type === 'file');
+  const nodes = fs.nodes as Record<string, any>;
+  const allFiles = Object.values(nodes).filter((n: any) => n.type === 'file');
   const getFilePath = (node: typeof allFiles[0]): string => {
     const parts: string[] = [];
     let current: typeof node | undefined = node;

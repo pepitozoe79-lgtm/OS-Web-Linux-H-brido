@@ -60,14 +60,14 @@ export default function VideoPlayer({ params }: { params?: any }) {
     if (!parentId) return [file as any];
 
     const siblings = getChildren(parentId);
-    const videoFiles = siblings.filter(n => 
+    const videoFiles = siblings.filter((n: any) => 
       n.type === 'file' && 
       (n.name.toLowerCase().endsWith('.mp4') || 
        n.name.toLowerCase().endsWith('.webm') || 
        n.name.toLowerCase().endsWith('.mov'))
     );
 
-    return videoFiles.map(f => ({
+    return videoFiles.map((f: any) => ({
       id: f.id,
       name: f.name,
       duration: 0,
@@ -79,7 +79,7 @@ export default function VideoPlayer({ params }: { params?: any }) {
   // Set initial index
   useEffect(() => {
     if (params?.fileId && playlist.length > 0) {
-      const index = playlist.findIndex(v => v.id === params.fileId);
+      const index = playlist.findIndex((v: any) => v.id === params.fileId);
       if (index !== -1) setCurrentIndex(index);
     }
   }, [params?.fileId, playlist.length]);

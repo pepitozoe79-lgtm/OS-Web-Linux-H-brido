@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback, memo, useMemo } from 'react';
 import {
-  Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Repeat1, Volume2, VolumeX, ListMusic, Music
+  Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Repeat1, Volume2, VolumeX, ListMusic, Music, X
 } from 'lucide-react';
 import { useFileSystem } from '@/hooks/useFileSystem';
 
@@ -114,14 +114,14 @@ export default function MusicPlayer({ params }: MusicPlayerProps) {
     if (!parentId) return [file as any];
 
     const siblings = getChildren(parentId);
-    const audioFiles = siblings.filter(n => 
+    const audioFiles = siblings.filter((n: any) => 
       n.type === 'file' && 
       (n.name.toLowerCase().endsWith('.mp3') || 
        n.name.toLowerCase().endsWith('.wav') || 
        n.name.toLowerCase().endsWith('.ogg'))
     );
 
-    return audioFiles.map(f => ({
+    return audioFiles.map((f: any) => ({
       id: f.id,
       title: f.name,
       artist: 'Unknown Artist',
@@ -159,7 +159,7 @@ export default function MusicPlayer({ params }: MusicPlayerProps) {
   // Initial index selection
   useEffect(() => {
     if (params?.fileId && tracks.length > 0) {
-      const index = tracks.findIndex(t => t.id === params.fileId);
+      const index = tracks.findIndex((t: any) => t.id === params.fileId);
       if (index !== -1) setCurrentIndex(index);
     }
   }, [params?.fileId, tracks.length]);
