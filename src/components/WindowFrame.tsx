@@ -214,21 +214,20 @@ const WindowFrame = memo(function WindowFrame({ window: win, children }: WindowF
     >
       {/* Resize handles wrapper */}
       <div
-        className="absolute inset-0 z-50"
+        className="absolute inset-0"
         style={{
-          cursor: getCursor as unknown as string,
-          pointerEvents: isDragging ? 'none' : 'auto',
+          zIndex: 40,
+          pointerEvents: 'none',
         }}
-        onMouseDown={handleResizeMouseDown}
       >
-        <div style={{ position: 'absolute', top: 0, left: RESIZE_HANDLE, right: RESIZE_HANDLE, height: RESIZE_HANDLE, cursor: 'n-resize' }} />
-        <div style={{ position: 'absolute', bottom: 0, left: RESIZE_HANDLE, right: RESIZE_HANDLE, height: RESIZE_HANDLE, cursor: 's-resize' }} />
-        <div style={{ position: 'absolute', left: 0, top: RESIZE_HANDLE, bottom: RESIZE_HANDLE, width: RESIZE_HANDLE, cursor: 'w-resize' }} />
-        <div style={{ position: 'absolute', right: 0, top: RESIZE_HANDLE, bottom: RESIZE_HANDLE, width: RESIZE_HANDLE, cursor: 'e-resize' }} />
-        <div style={{ position: 'absolute', top: 0, left: 0, width: RESIZE_HANDLE * 2, height: RESIZE_HANDLE * 2, cursor: 'nw-resize' }} />
-        <div style={{ position: 'absolute', top: 0, right: 0, width: RESIZE_HANDLE * 2, height: RESIZE_HANDLE * 2, cursor: 'ne-resize' }} />
-        <div style={{ position: 'absolute', bottom: 0, left: 0, width: RESIZE_HANDLE * 2, height: RESIZE_HANDLE * 2, cursor: 'sw-resize' }} />
-        <div style={{ position: 'absolute', bottom: 0, right: 0, width: RESIZE_HANDLE * 2, height: RESIZE_HANDLE * 2, cursor: 'se-resize' }} />
+        <div onMouseDown={handleResizeMouseDown} style={{ position: 'absolute', top: 0, left: RESIZE_HANDLE, right: RESIZE_HANDLE, height: RESIZE_HANDLE, cursor: 'n-resize', pointerEvents: 'auto' }} />
+        <div onMouseDown={handleResizeMouseDown} style={{ position: 'absolute', bottom: 0, left: RESIZE_HANDLE, right: RESIZE_HANDLE, height: RESIZE_HANDLE, cursor: 's-resize', pointerEvents: 'auto' }} />
+        <div onMouseDown={handleResizeMouseDown} style={{ position: 'absolute', left: 0, top: RESIZE_HANDLE, bottom: RESIZE_HANDLE, width: RESIZE_HANDLE, cursor: 'w-resize', pointerEvents: 'auto' }} />
+        <div onMouseDown={handleResizeMouseDown} style={{ position: 'absolute', right: 0, top: RESIZE_HANDLE, bottom: RESIZE_HANDLE, width: RESIZE_HANDLE, cursor: 'e-resize', pointerEvents: 'auto' }} />
+        <div onMouseDown={handleResizeMouseDown} style={{ position: 'absolute', top: 0, left: 0, width: RESIZE_HANDLE * 2, height: RESIZE_HANDLE * 2, cursor: 'nw-resize', pointerEvents: 'auto' }} />
+        <div onMouseDown={handleResizeMouseDown} style={{ position: 'absolute', top: 0, right: 0, width: RESIZE_HANDLE * 2, height: RESIZE_HANDLE * 2, cursor: 'ne-resize', pointerEvents: 'auto' }} />
+        <div onMouseDown={handleResizeMouseDown} style={{ position: 'absolute', bottom: 0, left: 0, width: RESIZE_HANDLE * 2, height: RESIZE_HANDLE * 2, cursor: 'sw-resize', pointerEvents: 'auto' }} />
+        <div onMouseDown={handleResizeMouseDown} style={{ position: 'absolute', bottom: 0, right: 0, width: RESIZE_HANDLE * 2, height: RESIZE_HANDLE * 2, cursor: 'se-resize', pointerEvents: 'auto' }} />
       </div>
 
       {/* Title bar */}
@@ -240,6 +239,7 @@ const WindowFrame = memo(function WindowFrame({ window: win, children }: WindowF
           borderRadius: isMaximized ? 0 : '12px 12px 0 0',
           transition: 'background 150ms ease',
           cursor: isMaximized ? 'default' : 'grab',
+          zIndex: 60,
         }}
         onMouseDown={handleTitleMouseDown}
         onDoubleClick={handleDoubleClickTitle}
