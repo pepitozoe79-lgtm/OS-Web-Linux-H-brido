@@ -58,11 +58,10 @@ export default function ImageViewer({ params }: ImageViewerProps) {
     return imageFiles.map(f => ({
       id: f.id,
       name: f.name,
-      src: '', // Will be populated by ObjectURL
+      src: '', 
       size: `${Math.round((f.size || 0) / 1024)} KB`,
-      content: f.content
     }));
-  }, [params?.fileId, fs.nodes]); // fs.nodes ensures it updates when files change
+  }, [params?.fileId, fs.nodes]);
 
   // Set initial index based on fileId
   useEffect(() => {
@@ -79,28 +78,25 @@ export default function ImageViewer({ params }: ImageViewerProps) {
   useEffect(() => {
     if (!currentImage) return;
 
-    // Check if we already have a URL for this blob
     if (blobUrls.current[currentImage.id]) {
       setDisplaySrc(blobUrls.current[currentImage.id]);
       return;
     }
 
-    if (currentImage.content instanceof Blob) {
-      const url = URL.createObjectURL(currentImage.content);
-      blobUrls.current[currentImage.id] = url;
-      setDisplaySrc(url);
-    } else if (typeof currentImage.content === 'string' && currentImage.content.startsWith('data:')) {
-      setDisplaySrc(currentImage.content);
-    } else {
-      // Fallback for demo or text-based "images"
-      setDisplaySrc('');
-    }
-
-    return () => {
-      // We don't revoke immediately to allow smooth transitions, 
-      // cleanup happens on component unmount
+    const load = async () => {
+      const raw = await fs.readFile(currentImage.id);
+      if (raw instanceof Blob) {
+        const url = URL.createObjectURL(raw);
+        blobUrls.current[currentImage.id] = url;
+        setDisplaySrc(url);
+      } else if (typeof raw === 'string' && raw.startsWith('data:')) {
+        setDisplaySrc(raw);
+      } else {
+        setDisplaySrc('');
+      }
     };
-  }, [currentImage]);
+    load();
+  }, [currentImage, fs]);
 
   // Cleanup all blob URLs on unmount
   useEffect(() => {

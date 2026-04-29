@@ -18,7 +18,7 @@ interface TerminalContext {
   history: string[];
 }
 
-const COMMANDS: Record<string, (args: string[], ctx: TerminalContext) => string | string[] | void> = {
+const COMMANDS: Record<string, (args: string[], ctx: TerminalContext) => string | string[] | void | Promise<string | string[] | void>> = {
   help: () => [
     'Available commands:',
     '  ls [path]     - List directory contents',

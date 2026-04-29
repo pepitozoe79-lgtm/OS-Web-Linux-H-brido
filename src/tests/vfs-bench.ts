@@ -19,8 +19,9 @@ async function runBenchmark() {
       name: `test_file_${i}.bin`,
       type: 'file',
       parentId: 'bench_root',
-      content: dummyContent, // Prueba real con Blobs
-      updatedAt: Date.now()
+      content: dummyContent, 
+      size: dummyContent.size,
+      modifiedAt: Date.now()
     });
   }
   const t1 = performance.now();

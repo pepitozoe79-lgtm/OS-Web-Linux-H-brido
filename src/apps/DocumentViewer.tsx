@@ -76,7 +76,8 @@ function highlightLine(line: string, lang: string): ReactElement {
   return <>{elements}</>;
 }
 
-export default function DocumentViewer({ fileNodeId }: DocumentViewerProps) {
+export default function DocumentViewer({ params }: { params?: any }) {
+  const fileNodeId = params?.fileId || params?.fileNodeId;
   const { fs, readFile, getNodeById, getChildren } = useFileSystem();
   const [currentFileId, setCurrentFileId] = useState<string | undefined>(fileNodeId);
   const [showLineNumbers, setShowLineNumbers] = useState(true);
@@ -89,7 +90,21 @@ export default function DocumentViewer({ fileNodeId }: DocumentViewerProps) {
   const contentRef = useRef<HTMLDivElement>(null);
 
   const node = currentFileId ? getNodeById(currentFileId) : undefined;
-  const content = currentFileId ? readFile(currentFileId) || '' : '';
+  const [content, setContent] = useState('');
+  
+  useEffect(() => {
+    if (!currentFileId) {
+      setContent('');
+      return;
+    }
+    const load = async () => {
+      const raw = await readFile(currentFileId);
+      const text = raw instanceof Blob ? await raw.text() : (raw || '');
+      setContent(text);
+    };
+    load();
+  }, [currentFileId, readFile]);
+
   const lines = useMemo(() => content.split('\n'), [content]);
   const ext = node?.name?.split('.').pop()?.toLowerCase() || 'txt';
   const lang = EXTENSION_LANG[ext] || 'text';

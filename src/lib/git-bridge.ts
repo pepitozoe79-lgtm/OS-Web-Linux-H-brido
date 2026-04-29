@@ -9,8 +9,8 @@ export const createGitFs = (fs: ReturnType<typeof useFileSystem>) => {
     async readFile(path: string, opts: any) {
       const node = fs.findNodeByPath(path);
       if (!node || node.type !== 'file') throw new Error(`ENOENT: no such file or directory, open '${path}'`);
-      const content = fs.readFile(node.id) || '';
-      if (opts?.encoding === 'utf8') return typeof content === 'string' ? content : await this._blobToString(content);
+      const content = await fs.readFile(node.id) || '';
+      if (opts?.encoding === 'utf8') return typeof content === 'string' ? content : await content.text();
       return typeof content === 'string' ? new TextEncoder().encode(content) : new Uint8Array(await content.arrayBuffer());
     },
 
@@ -24,9 +24,9 @@ export const createGitFs = (fs: ReturnType<typeof useFileSystem>) => {
       const content = data instanceof Uint8Array ? new Blob([data]) : data;
       
       if (existing) {
-        fs.writeFile(existing.id, content);
+        await fs.writeFile(existing.id, content);
       } else {
-        fs.createFile(parentNode.id, fileName, content);
+        await fs.createFile(parentNode.id, fileName, content);
       }
     },
 

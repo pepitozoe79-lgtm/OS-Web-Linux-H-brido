@@ -32,7 +32,7 @@ const formatTime = (seconds: number): string => {
 };
 
 // ---- Main Video Player ----
-export default function VideoPlayer({ params }: VideoPlayerProps) {
+export default function VideoPlayer({ params }: { params?: any }) {
   const { fs, getNodeById, getChildren } = useFileSystem();
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -164,12 +164,11 @@ export default function VideoPlayer({ params }: VideoPlayerProps) {
       <div className="flex-1 flex items-center justify-center relative bg-black">
         <video
           ref={videoRef}
-          className="w-full h-full max-h-full"
+          className="w-full h-full object-contain"
           onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
           onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
           onEnded={() => setIsPlaying(false)}
           onClick={handlePlayPause}
-          playbackRate={playbackSpeed}
         />
 
         {/* Big Play Button when paused */}

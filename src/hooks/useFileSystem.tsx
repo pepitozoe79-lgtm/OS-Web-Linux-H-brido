@@ -44,11 +44,13 @@ interface FileSystemContextType {
   moveToTrash: (id: string) => void;
   renameNode: (id: string, newName: string) => void;
   moveNode: (id: string, newParentId: string) => void;
-  readFile: (id: string) => string | Blob | undefined;
-  writeFile: (id: string, content: string | Blob) => void;
+  readFile: (id: string) => Promise<string | Blob | undefined>;
+  writeFile: (id: string, content: string | Blob) => Promise<void>;
   emptyTrash: () => void;
   getTrashItems: () => FileSystemNode[];
   findNodeByPath: (path: string) => FileSystemNode | undefined;
+  mountHostDirectory: (parentId: string) => Promise<string | null>;
+  scanHostDirectory: (parentId: string, handle: FileSystemDirectoryHandle) => Promise<void>;
 }
 
 const FileSystemContext = createContext<FileSystemContextType | null>(null);
@@ -222,7 +224,7 @@ export function FileSystemProvider({ children }: { children: React.ReactNode }) 
 
   const readFile = useCallback((id: string) => fs.nodes[id]?.type === 'file' ? fs.nodes[id].content : undefined, [fs.nodes]);
 
-  const writeFile = useCallback((id: string, content: string | Blob) => {
+  const writeFile = useCallback(async (id: string, content: string | Blob) => {
     setFs((prev) => {
       const node = prev.nodes[id];
       if (!node || node.type !== 'file') return prev;

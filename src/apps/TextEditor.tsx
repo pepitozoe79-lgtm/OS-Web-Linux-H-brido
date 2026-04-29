@@ -102,10 +102,11 @@ const TextEditor: React.FC<TextEditorProps> = ({ params }) => {
     setActiveFileId(id);
   };
 
-  const openFileById = (nodeId: string) => {
+  const openFileById = async (nodeId: string) => {
     const node = fs.nodes[nodeId];
     if (!node || node.type !== 'file') return;
-    const content = readFile(nodeId) || '';
+    const rawContent = await readFile(nodeId);
+    const content = rawContent instanceof Blob ? await rawContent.text() : (rawContent || '');
     const existing = files.find(f => f.id === nodeId);
     if (existing) {
       setActiveFileId(nodeId);
@@ -119,20 +120,20 @@ const TextEditor: React.FC<TextEditorProps> = ({ params }) => {
     saveRecent(updated);
   };
 
-  const saveActiveFile = () => {
+  const saveActiveFile = async () => {
     if (!activeFile) return;
     if (activeFile.id.startsWith('new-')) {
       // Save as new file in Documents
       const docsNode = Object.values(fs.nodes).find(n => n.name === 'Documents');
       if (docsNode) {
-        const newId = createFile(docsNode.id, activeFile.name, activeFile.content);
+        const newId = await createFile(docsNode.id, activeFile.name, activeFile.content);
         setFiles(prev => prev.map(f => f.id === activeFile.id ? { ...f, id: newId, isModified: false } : f));
         setActiveFileId(newId);
         const updated = [newId, ...recentFiles.filter(r => r !== newId)].slice(0, 10);
         saveRecent(updated);
       }
     } else {
-      writeFile(activeFile.id, activeFile.content);
+      await writeFile(activeFile.id, activeFile.content);
       setFiles(prev => prev.map(f => f.id === activeFile.id ? { ...f, isModified: false } : f));
     }
   };

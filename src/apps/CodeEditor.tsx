@@ -140,7 +140,7 @@ function FileTree({
   );
 }
 
-export default function CodeEditor() {
+export default function CodeEditor({ params }: { params?: any }) {
   const fs = useFileSystem();
   const [tabs, setTabs] = useState<EditorTab[]>([]);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
@@ -164,8 +164,9 @@ export default function CodeEditor() {
   }, [fs.fs.nodes]);
 
   const openFile = useCallback(
-    (nodeId: string, name: string) => {
-      const content = fs.readFile(nodeId) || '';
+    async (nodeId: string, name: string) => {
+      const rawContent = await fs.readFile(nodeId);
+      const content = rawContent instanceof Blob ? await rawContent.text() : (rawContent || '');
       const existing = tabs.find((t) => t.fileNodeId === nodeId);
       if (existing) {
         setActiveTabId(existing.id);
@@ -184,6 +185,13 @@ export default function CodeEditor() {
     },
     [fs, tabs]
   );
+
+  useEffect(() => {
+    if (params?.fileId) {
+      const node = fs.getNodeById(params.fileId);
+      if (node) openFile(node.id, node.name);
+    }
+  }, [params?.fileId, fs, openFile]);
 
   const newFile = useCallback(() => {
     const newTab: EditorTab = {
@@ -214,10 +222,10 @@ export default function CodeEditor() {
     [tabs, activeTabId]
   );
 
-  const saveFile = useCallback(() => {
+  const saveFile = useCallback(async () => {
     if (!activeTab) return;
     if (activeTab.fileNodeId) {
-      fs.writeFile(activeTab.fileNodeId, activeTab.content);
+      await fs.writeFile(activeTab.fileNodeId, activeTab.content);
       setTabs((prev) =>
         prev.map((t) => (t.id === activeTab.id ? { ...t, isDirty: false } : t))
       );

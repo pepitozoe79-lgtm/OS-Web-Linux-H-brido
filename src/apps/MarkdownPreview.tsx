@@ -138,7 +138,7 @@ function greet(name) {
 Enjoy writing!
 `;
 
-export default function MarkdownPreview() {
+export default function MarkdownPreview({ params }: { params?: any }) {
   const fs = useFileSystem();
   const [content, setContent] = useState(DEFAULT_MD);
   const [syncScroll, setSyncScroll] = useState(true);
@@ -199,26 +199,38 @@ export default function MarkdownPreview() {
     setTimeout(() => setCopied(false), 1500);
   }, [html]);
 
-  const saveToFS = useCallback(() => {
+  const saveToFS = useCallback(async () => {
     const docs = Object.values(fs.fs.nodes).find(
       (n) => n.name === 'Documents' && n.parentId
     );
     if (docs) {
-      fs.createFile(docs.id, 'document.md', content);
+      await fs.createFile(docs.id, 'document.md', content);
     }
   }, [fs, content]);
 
-  const loadFromFS = useCallback(() => {
+  const loadFromFS = useCallback(async () => {
     const docs = Object.values(fs.fs.nodes).find(
       (n) => n.name === 'Documents' && n.parentId
     );
     if (!docs) return;
     const files = fs.getChildren(docs.id).filter((n) => n.type === 'file' && n.name.endsWith('.md'));
     if (files.length > 0) {
-      const c = fs.readFile(files[0].id) || '';
-      setContent(c);
+      const raw = await fs.readFile(files[0].id);
+      const text = raw instanceof Blob ? await raw.text() : (raw || '');
+      setContent(text);
     }
   }, [fs]);
+
+  useEffect(() => {
+    if (params?.fileId) {
+      const load = async () => {
+        const raw = await fs.readFile(params.fileId);
+        const text = raw instanceof Blob ? await raw.text() : (raw || '');
+        setContent(text);
+      };
+      load();
+    }
+  }, [params?.fileId, fs]);
 
   return (
     <div className="h-full flex flex-col" style={{ background: 'var(--bg-window)' }}>

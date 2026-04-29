@@ -138,7 +138,7 @@ function getJsonStats(data: unknown): { keyCount: number; arrayCount: number; ma
   return { keyCount, arrayCount, maxDepth };
 }
 
-export default function JsonFormatter() {
+export default function JsonFormatter({ params }: { params?: any }) {
   const fs = useFileSystem();
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
@@ -250,6 +250,18 @@ export default function JsonFormatter() {
     processJson(text);
   }, [processJson]);
 
+  useEffect(() => {
+    if (params?.fileId) {
+      const load = async () => {
+        const raw = await fs.readFile(params.fileId);
+        const text = raw instanceof Blob ? await raw.text() : (raw || '');
+        setInput(text);
+        processJson(text);
+      };
+      load();
+    }
+  }, [params?.fileId, fs, processJson]);
+
   const handleInputChange = useCallback((text: string) => {
     setInput(text);
     if (text.trim()) {
@@ -268,16 +280,17 @@ export default function JsonFormatter() {
     }
   }, [validateJson, indent]);
 
-  const loadFromFS = useCallback(() => {
+  const loadFromFS = useCallback(async () => {
     const docs = Object.values(fs.fs.nodes).find(
       (n) => n.name === 'Documents' && n.parentId
     );
     if (!docs) return;
     const files = fs.getChildren(docs.id).filter((n) => n.type === 'file' && n.name.endsWith('.json'));
     if (files.length > 0) {
-      const content = fs.readFile(files[0].id) || '';
-      setInput(content);
-      processJson(content);
+      const raw = await fs.readFile(files[0].id);
+      const text = raw instanceof Blob ? await raw.text() : (raw || '');
+      setInput(text);
+      processJson(text);
     }
   }, [fs, processJson]);
 
