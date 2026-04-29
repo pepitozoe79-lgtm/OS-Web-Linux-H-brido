@@ -259,29 +259,27 @@ const WindowFrame = memo(function WindowFrame({ window: win, children }: WindowF
         </div>
 
         {/* Right: window controls */}
-        <div className="flex items-center shrink-0 relative" style={{ zIndex: 100 }}>
+        <div className="flex items-center shrink-0">
           <button
-            onClick={handleMinimize}
-            onMouseDown={(e) => e.stopPropagation()}
-            className="w-9 h-9 flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors relative z-[110]"
-            style={{ borderRadius: isMaximized ? 0 : '0 0 0 0' }}
+            onMouseDown={handleMinimize}
+            className="w-9 h-9 flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            style={{ borderRadius: isMaximized ? 0 : '0 0 0 0', position: 'relative', zIndex: 70 }}
             title="Minimize"
           >
             <Icons.Minus size={14} />
           </button>
           <button
-            onClick={handleMaximize}
-            onMouseDown={(e) => e.stopPropagation()}
-            className="w-9 h-9 flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors relative z-[110]"
+            onMouseDown={handleMaximize}
+            className="w-9 h-9 flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            style={{ position: 'relative', zIndex: 70 }}
             title={isMaximized ? 'Restore' : 'Maximize'}
           >
             {isMaximized ? <Icons.Copy size={12} /> : <Icons.Square size={12} />}
           </button>
           <button
-            onClick={handleClose}
-            onMouseDown={(e) => e.stopPropagation()}
-            className="w-9 h-9 flex items-center justify-center text-[var(--text-secondary)] transition-colors pointer-events-auto"
-            style={{ borderRadius: isMaximized ? 0 : '0 12px 0 0', position: 'relative', zIndex: 110 }}
+            onMouseDown={handleClose}
+            className="w-9 h-9 flex items-center justify-center text-[var(--text-secondary)] transition-colors"
+            style={{ borderRadius: isMaximized ? 0 : '0 12px 0 0', position: 'relative', zIndex: 70 }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = '#F44336';
               e.currentTarget.style.color = 'white';
