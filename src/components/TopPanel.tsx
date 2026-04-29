@@ -171,7 +171,7 @@ const TopPanel = memo(function TopPanel() {
                   key={item.label} 
                   className="flex items-center gap-2 px-3 py-2 hover:bg-[var(--bg-hover)] cursor-pointer"
                   onClick={() => {
-                    if (item.label === 'Wi-Fi') dispatch({ type: 'ADD_NOTIFICATION', notification: { title: 'Network', message: 'Wi-Fi toggled', icon: 'Wifi' }});
+                    if (item.label === 'Wi-Fi') dispatch({ type: 'ADD_NOTIFICATION', notification: { appId: 'system', appName: 'System', appIcon: 'Wifi', title: 'Network', message: 'Wi-Fi toggled', isRead: false }});
                   }}
                 >
                   <span className="text-xs">{item.icon}</span>
