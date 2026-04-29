@@ -327,14 +327,12 @@ const COMMANDS: Record<string, (args: string[], ctx: TerminalContext) => string 
             dir: targetDir,
             url,
             corsProxy: 'https://cors.isomorphic-git.org',
-            onMessage: (msg) => {
-              // We can't easily push to Terminal lines from here without a refactor,
-              // so we just log to console or return at the end.
+            onMessage: (msg: any) => {
               console.log('Git:', msg);
             }
           }).then(() => {
             resolve(`Successfully cloned ${url} into ${targetDir}`);
-          }).catch(err => {
+          }).catch((err: any) => {
             resolve(`git clone error: ${err.message}`);
           });
         });

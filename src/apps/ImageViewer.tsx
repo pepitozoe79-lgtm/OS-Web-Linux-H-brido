@@ -23,7 +23,7 @@ interface ImageViewerProps {
 
 // ---- Main Image Viewer ----
 export default function ImageViewer({ params }: ImageViewerProps) {
-  const { fs, getNodeById, getChildren } = useFileSystem();
+  const { fs, getNodeById, getChildren, readFile } = useFileSystem();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [zoom, setZoom] = useState(1);
   const [isSlideshow, setIsSlideshow] = useState(false);
@@ -84,7 +84,7 @@ export default function ImageViewer({ params }: ImageViewerProps) {
     }
 
     const load = async () => {
-      const raw = await fs.readFile(currentImage.id);
+      const raw = await readFile(currentImage.id);
       if (raw instanceof Blob) {
         const url = URL.createObjectURL(raw);
         blobUrls.current[currentImage.id] = url;
