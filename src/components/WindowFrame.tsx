@@ -48,7 +48,9 @@ const WindowFrame = memo(function WindowFrame({ window: win, children }: WindowF
   // ---- Drag ----
   const handleTitleMouseDown = useCallback(
     (e: React.MouseEvent) => {
-      if (isMaximized || e.target !== e.currentTarget) return;
+      const target = e.target as HTMLElement;
+      const isButton = target.closest('button');
+      if (isMaximized || isButton) return;
       e.preventDefault();
       dragRef.current = {
         isDragging: true,
@@ -156,6 +158,7 @@ const WindowFrame = memo(function WindowFrame({ window: win, children }: WindowF
 
   const handleMinimize = useCallback(
     (e: React.MouseEvent) => {
+      e.preventDefault();
       e.stopPropagation();
       dispatch({ type: 'MINIMIZE_WINDOW', windowId: win.id });
     },
@@ -164,6 +167,7 @@ const WindowFrame = memo(function WindowFrame({ window: win, children }: WindowF
 
   const handleMaximize = useCallback(
     (e: React.MouseEvent) => {
+      e.preventDefault();
       e.stopPropagation();
       if (isMaximized) {
         dispatch({ type: 'RESTORE_WINDOW', windowId: win.id });
@@ -176,6 +180,7 @@ const WindowFrame = memo(function WindowFrame({ window: win, children }: WindowF
 
   const handleClose = useCallback(
     (e: React.MouseEvent) => {
+      e.preventDefault();
       e.stopPropagation();
       dispatch({ type: 'CLOSE_WINDOW', windowId: win.id });
     },
@@ -261,7 +266,8 @@ const WindowFrame = memo(function WindowFrame({ window: win, children }: WindowF
         {/* Right: window controls */}
         <div className="flex items-center shrink-0">
           <button
-            onMouseDown={handleMinimize}
+            onClick={handleMinimize}
+            onMouseDown={(e) => e.stopPropagation()}
             className="w-9 h-9 flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
             style={{ borderRadius: isMaximized ? 0 : '0 0 0 0', position: 'relative', zIndex: 70 }}
             title="Minimize"
@@ -269,7 +275,8 @@ const WindowFrame = memo(function WindowFrame({ window: win, children }: WindowF
             <Icons.Minus size={14} />
           </button>
           <button
-            onMouseDown={handleMaximize}
+            onClick={handleMaximize}
+            onMouseDown={(e) => e.stopPropagation()}
             className="w-9 h-9 flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
             style={{ position: 'relative', zIndex: 70 }}
             title={isMaximized ? 'Restore' : 'Maximize'}
@@ -277,7 +284,8 @@ const WindowFrame = memo(function WindowFrame({ window: win, children }: WindowF
             {isMaximized ? <Icons.Copy size={12} /> : <Icons.Square size={12} />}
           </button>
           <button
-            onMouseDown={handleClose}
+            onClick={handleClose}
+            onMouseDown={(e) => e.stopPropagation()}
             className="w-9 h-9 flex items-center justify-center text-[var(--text-secondary)] transition-colors"
             style={{ borderRadius: isMaximized ? 0 : '0 12px 0 0', position: 'relative', zIndex: 70 }}
             onMouseEnter={(e) => {

@@ -149,7 +149,7 @@ function osReducer(state: OSState, action: OSAction): OSState {
         : null;
       return {
         ...state,
-        windows: remaining,
+        windows: remaining.map((w) => ({ ...w, isFocused: w.id === newActiveId })),
         activeWindowId: newActiveId,
         dockItems: updatedDock,
       };
@@ -171,25 +171,41 @@ function osReducer(state: OSState, action: OSAction): OSState {
       const newActiveId = updated
         .filter((w) => w.state !== 'minimized')
         .reduce((a, b) => (a && a.zIndex > b.zIndex ? a : b), null as Window | null);
-      return { ...state, windows: updated, activeWindowId: newActiveId?.id ?? null, dockItems: updatedDock };
+      
+      const finalWindows = updated.map((w) => ({
+        ...w,
+        isFocused: w.id === newActiveId?.id,
+      }));
+
+      return { 
+        ...state, 
+        windows: finalWindows, 
+        activeWindowId: newActiveId?.id ?? null, 
+        dockItems: updatedDock 
+      };
     }
 
     case 'MAXIMIZE_WINDOW': {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
+      const nextZ = state.nextZIndex + 1;
       return {
         ...state,
+        activeWindowId: action.windowId,
+        nextZIndex: nextZ,
         windows: state.windows.map((w) =>
           w.id === action.windowId
             ? {
                 ...w,
                 state: 'maximized' as WindowState,
+                isFocused: true,
+                zIndex: nextZ,
                 prevPosition: { ...w.position },
                 prevSize: { ...w.size },
                 position: { x: 0, y: TOP_PANEL_HEIGHT },
                 size: { width: vw, height: vh - TOP_PANEL_HEIGHT - 48 },
               }
-            : w
+            : { ...w, isFocused: false }
         ),
       };
     }
@@ -197,19 +213,24 @@ function osReducer(state: OSState, action: OSAction): OSState {
     case 'RESTORE_WINDOW': {
       const win = state.windows.find((w) => w.id === action.windowId);
       if (!win) return state;
+      const nextZ = state.nextZIndex + 1;
       return {
         ...state,
+        activeWindowId: action.windowId,
+        nextZIndex: nextZ,
         windows: state.windows.map((w) =>
           w.id === action.windowId
             ? {
                 ...w,
                 state: 'normal' as WindowState,
+                isFocused: true,
+                zIndex: nextZ,
                 position: win.prevPosition || w.position,
                 size: win.prevSize || w.size,
                 prevPosition: undefined,
                 prevSize: undefined,
               }
-            : w
+            : { ...w, isFocused: false }
         ),
       };
     }
