@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useFileSystem } from '@/hooks/useFileSystem';
 import { useOS } from '@/hooks/useOSStore';
+import { recoveryService } from '@/lib/vfs-recovery';
+import { vfsDriver, generateHash } from '@/lib/vfs-db';
 
 interface TerminalLine {
   type: 'input' | 'output' | 'error' | 'system';
@@ -36,6 +38,10 @@ const COMMANDS: Record<string, (args: string[], ctx: TerminalContext) => string 
     '  mount         - Mount a host directory (File System Access API)',
     '  calc <expr>   - Calculate expression',
     '  history       - Show command history',
+    '  bench         - Run VFS performance benchmark',
+    '  backup        - Create a snapshot backup of the VFS',
+    '  restore       - Restore VFS from a snapshot file',
+    '  fsck          - File System Consistency Check (Integrity Audit)',
     '  help          - Show this help message',
   ],
 
@@ -351,6 +357,104 @@ const COMMANDS: Record<string, (args: string[], ctx: TerminalContext) => string 
       return `git: '${subCommand}' is not implemented yet.`;
     } catch (err: any) {
       return `git error: ${err.message}`;
+    }
+  },
+
+  bench: async (_args, _ctx) => {
+    try {
+      // @ts-ignore - dynamic import
+      const { default: runBenchmark } = await import('../tests/vfs-bench');
+      const results = await runBenchmark();
+      return [
+        '\x1b[36m🚀 VFS Performance Audit Results:\x1b[0m',
+        `  Write (500 files): ${results.write.toFixed(2)}ms`,
+        `  Read (500 files):  ${results.read.toFixed(2)}ms`,
+        `  Integrity:         ${results.integrity === 500 ? '\x1b[32mPASSED\x1b[0m' : '\x1b[31mFAILED\x1b[0m'}`,
+        '',
+        'Detailed table available in browser console.'
+      ];
+    } catch (err: any) {
+      return `bench error: ${err.message}`;
+    }
+  },
+
+  backup: async (_args, _ctx) => {
+    try {
+      const blob = await recoveryService.createSnapshot();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `vfs-snapshot-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      return 'Snapshot backup generated and download started successfully.';
+    } catch (err: any) {
+      return `backup error: ${err.message}`;
+    }
+  },
+
+  restore: async (_args, _ctx) => {
+    return new Promise<string>((resolve) => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = async (e: any) => {
+        const file = e.target.files[0];
+        if (!file) {
+          resolve('Restore cancelled.');
+          return;
+        }
+        try {
+          const meta = await recoveryService.restoreFromSnapshot(file);
+          resolve(`Restore successful! System: ${meta.system}, Version: ${meta.version}, Date: ${new Date(meta.timestamp).toLocaleString()}. Please refresh or restart the OS.`);
+        } catch (err: any) {
+          resolve(`restore error: ${err.message}`);
+        }
+      };
+      input.click();
+    });
+  },
+
+  fsck: async (args, ctx) => {
+    try {
+      const repair = args.includes('--repair');
+      const outputs: string[] = [
+        `\x1b[36m🔍 Starting File System Consistency Check${repair ? ' (REPAIR MODE)' : ''}...\x1b[0m`,
+        ''
+      ];
+
+      const report = await vfsDriver.fsck(repair);
+
+      if (report.corrupted.length > 0) {
+        report.corrupted.forEach(name => outputs.push(`\x1b[31m[CORRUPT]\x1b[0m ${name}`));
+      }
+      if (report.orphans.length > 0) {
+        report.orphans.forEach(name => outputs.push(`\x1b[33m[ORPHAN]\x1b[0m  ${name}`));
+      }
+
+      outputs.push('');
+      outputs.push('\x1b[36m📊 FSCK Report:\x1b[0m');
+      outputs.push(`  - Healthy Files:   ${report.healthy}`);
+      outputs.push(`  - \x1b[31mCorrupted Files: ${report.corrupted.length}\x1b[0m`);
+      outputs.push(`  - \x1b[33mOrphan Nodes:    ${report.orphans.length}\x1b[0m`);
+      outputs.push('');
+
+      if (repair) {
+        outputs.push('\x1b[32m🔧 Repair operation completed.\x1b[0m');
+        outputs.push('  - Corrupted files moved to /lost+found');
+        outputs.push('  - Orphan nodes linked to /');
+        outputs.push('');
+      }
+
+      outputs.push(report.corrupted.length === 0 && report.orphans.length === 0 
+        ? '\x1b[32m✅ File system is CONSISTENT.\x1b[0m' 
+        : `\x1b[31m❌ Inconsistencies detected.${repair ? '' : " Run 'fsck --repair' to fix."}\x1b[0m`);
+
+      return outputs;
+    } catch (err: any) {
+      return `fsck error: ${err.message}`;
     }
   },
 };

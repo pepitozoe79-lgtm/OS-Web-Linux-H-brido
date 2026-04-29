@@ -11,6 +11,19 @@ const DB_VERSION = 1;
 const NODES_STORE = 'nodes';
 const METADATA_STORE = 'metadata';
 
+export async function generateHash(content: string | Blob | undefined): Promise<string> {
+  if (content === undefined) return "";
+  try {
+    const data = typeof content === "string" ? new TextEncoder().encode(content) : await content.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+  } catch (e) {
+    console.error("Hashing failed:", e);
+    return "hash-error";
+  }
+}
+
 export class VFSDriver {
   private db: IDBDatabase | null = null;
 
@@ -65,8 +78,21 @@ export class VFSDriver {
     });
   }
 
+  async getNode(id: string): Promise<FileSystemNode | undefined> {
+    await this.init();
+    return new Promise((resolve, reject) => {
+      const store = this.getStore(NODES_STORE);
+      const request = store.get(id);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
   async saveNode(node: FileSystemNode): Promise<void> {
     await this.init();
+    if (node.type === 'file' && node.content !== undefined) {
+      node.hash = await generateHash(node.content);
+    }
     return new Promise((resolve, reject) => {
       const store = this.getStore(NODES_STORE, 'readwrite');
       const request = store.put(node);
@@ -77,6 +103,12 @@ export class VFSDriver {
 
   async saveNodes(nodes: FileSystemNode[]): Promise<void> {
     await this.init();
+    // Pre-calculate hashes for all files
+    for (const node of nodes) {
+      if (node.type === 'file' && node.content !== undefined && !node.hash) {
+        node.hash = await generateHash(node.content);
+      }
+    }
     return new Promise((resolve, reject) => {
       if (!this.db) return reject('No DB');
       const transaction = this.db.transaction(NODES_STORE, 'readwrite');
@@ -130,6 +162,60 @@ export class VFSDriver {
       transaction.onerror = () => reject(transaction.error);
     });
   }
+
+  async fsck(repair = false): Promise<{ healthy: number; corrupted: string[]; orphans: string[] }> {
+    const nodesMap = await this.getAllNodes();
+    const nodes = Object.values(nodesMap);
+    const report = { healthy: 0, corrupted: [] as string[], orphans: [] as string[] };
+    
+    // Ensure lost+found exists if repairing
+    let lostFoundId = nodes.find(n => n.name === 'lost+found')?.id;
+    if (repair && !lostFoundId) {
+      lostFoundId = Math.random().toString(36).slice(2);
+      await this.saveNode({
+        id: lostFoundId,
+        name: 'lost+found',
+        type: 'folder',
+        parentId: 'root', // Assuming root exists
+        createdAt: Date.now(),
+        modifiedAt: Date.now()
+      });
+    }
+
+    for (const node of nodes) {
+      if (node.type === 'file' && node.content !== undefined) {
+        const actualHash = await generateHash(node.content);
+        if (node.hash && actualHash !== node.hash) {
+          report.corrupted.push(node.name);
+          if (repair && lostFoundId) {
+            await this.saveNode({
+              ...node,
+              name: `[CORRUPT]_${node.name}_${Date.now()}`,
+              parentId: lostFoundId,
+              modifiedAt: Date.now()
+            });
+          }
+        } else {
+          report.healthy++;
+        }
+      }
+
+      // Structure check
+      if (node.parentId && node.parentId !== 'root' && !nodesMap[node.parentId]) {
+        report.orphans.push(node.name);
+        if (repair) {
+          await this.saveNode({
+            ...node,
+            parentId: 'root',
+            modifiedAt: Date.now()
+          });
+        }
+      }
+    }
+
+    return report;
+  }
 }
 
 export const vfsDriver = new VFSDriver();
+export const vfsDb = vfsDriver;

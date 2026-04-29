@@ -66,6 +66,7 @@ export interface FileSystemNode {
   content?: string | Blob;
   size?: number;
   isHidden?: boolean;
+  hash?: string;
   handle?: FileSystemHandle;
 }
 

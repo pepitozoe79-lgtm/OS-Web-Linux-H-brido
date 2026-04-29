@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import type { FileSystemNode, FileSystemState, FileAssociation } from '@/types';
-import { vfsDriver } from '@/lib/vfs-db';
+import { vfsDriver, generateHash } from '@/lib/vfs-db';
 
 const generateId = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
 
@@ -67,6 +67,7 @@ const createDefaultFS = (): FileSystemState => {
   const trashId = generateId();
   const trashFilesId = generateId();
   const trashInfoId = generateId();
+  const lostFoundId = generateId();
 
   const nodes: Record<string, FileSystemNode> = {
     [rootId]: { id: rootId, name: '/', type: 'folder', parentId: null, createdAt: Date.now(), modifiedAt: Date.now() },
@@ -82,6 +83,7 @@ const createDefaultFS = (): FileSystemState => {
     [trashId]: { id: trashId, name: '.trash', type: 'folder', parentId: userId, createdAt: Date.now(), modifiedAt: Date.now(), isHidden: true },
     [trashFilesId]: { id: trashFilesId, name: 'files', type: 'folder', parentId: trashId, createdAt: Date.now(), modifiedAt: Date.now() },
     [trashInfoId]: { id: trashInfoId, name: 'info', type: 'folder', parentId: trashId, createdAt: Date.now(), modifiedAt: Date.now() },
+    [lostFoundId]: { id: lostFoundId, name: 'lost+found', type: 'folder', parentId: rootId, createdAt: Date.now(), modifiedAt: Date.now(), isHidden: true },
   };
 
   const readmeId = generateId();
@@ -316,19 +318,32 @@ export function FileSystemProvider({ children }: { children: React.ReactNode }) 
     }
   }, [scanHostDirectory]);
 
-  // Override readFile to handle host handles
+  // Override readFile to handle host handles and hash validation
   const originalReadFile = readFile;
-  const readHostFile = useCallback(async (id: string) => {
+  const readHostFile = useCallback(async (id: string, validate = true) => {
     const node = fs.nodes[id];
-    if (node?.handle && node.type === 'file') {
+    if (!node) return undefined;
+
+    let content: string | Blob | undefined;
+    if (node.handle && node.type === 'file') {
       const file = await (node.handle as any).getFile();
-      // If it's a text file, return string, otherwise Blob
       const textExts = ['.txt', '.md', '.json', '.js', '.ts', '.css', '.html'];
       const isText = textExts.some(ext => node.name.endsWith(ext));
-      if (isText) return await file.text();
-      return file;
+      content = isText ? await file.text() : file;
+    } else {
+      content = originalReadFile(id);
     }
-    return originalReadFile(id);
+
+    // Cryptographic Validation on Read
+    if (validate && node.type === 'file' && node.hash && content !== undefined) {
+      const currentHash = await generateHash(content);
+      if (currentHash !== node.hash) {
+        console.error(`INTEGRITY ERROR: File ${node.name} is corrupted!`);
+        throw new Error(`Integrity violation: The file '${node.name}' has been tampered with or corrupted (Hash Mismatch).`);
+      }
+    }
+
+    return content;
   }, [fs.nodes, originalReadFile]);
 
   // Override writeFile to handle host handles

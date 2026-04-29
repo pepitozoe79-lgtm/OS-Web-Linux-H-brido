@@ -1,0 +1,44 @@
+{
+  "metadata": {
+    "system": "OS-Web-Linux-Híbrido",
+    "version": "2.5.0-hybrid",
+    "timestamp": 1714312800000,
+    "nodeCount": 4
+  },
+  "data": [
+    {
+      "id": "root",
+      "name": "/",
+      "type": "folder",
+      "parentId": null,
+      "createdAt": 1714312800000,
+      "modifiedAt": 1714312800000
+    },
+    {
+      "id": "home",
+      "name": "home",
+      "type": "folder",
+      "parentId": "root",
+      "createdAt": 1714312800000,
+      "modifiedAt": 1714312800000
+    },
+    {
+      "id": "user",
+      "name": "user",
+      "type": "folder",
+      "parentId": "home",
+      "createdAt": 1714312800000,
+      "modifiedAt": 1714312800000
+    },
+    {
+      "id": "welcome-file",
+      "name": "integrity_test.txt",
+      "type": "file",
+      "parentId": "user",
+      "content": "Hello World",
+      "hash": "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e",
+      "createdAt": 1714312800000,
+      "modifiedAt": 1714312800000
+    }
+  ]
+}
